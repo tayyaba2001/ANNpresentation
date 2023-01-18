@@ -2,7 +2,6 @@
 Cancer detection system
 
 def crop_brain_contour(image, plot=False):
-    
     #import imutils
     #import cv2
     #from matplotlib import pyplot as plt
@@ -22,7 +21,7 @@ def crop_brain_contour(image, plot=False):
     cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     cnts = imutils.grab_contours(cnts)
     c = max(cnts, key=cv2.contourArea)
-   # Find the extreme points
+    # find extreme points
     extLeft = tuple(c[c[:, :, 0].argmin()][0])
     extRight = tuple(c[c[:, :, 0].argmax()][0])
     extTop = tuple(c[c[:, :, 1].argmin()][0])
@@ -55,3 +54,56 @@ def crop_brain_contour(image, plot=False):
         plt.show()
     
     return new_image
+    
+    
+    
+    def load_data(dir_list, image_size):
+    """
+    Read images, resize and normalize them. 
+    Arguments:
+        dir_list: list of strings representing file directories.
+    Returns:
+        X: A numpy array with shape = (#_examples, image_width, image_height, #_channels)
+        y: A numpy array with shape = (#_examples, 1)
+    """
+
+    # load all images in a directory
+    X = []
+    y = []
+    image_width, image_height = image_size
+    
+    for directory in dir_list:
+        for filename in listdir(directory):
+            # load the image
+           #   CHANGE UNDER STATEMENT
+            image = cv2.imread(directory + '/' + filename)
+            # crop the brain and ignore the unnecessary rest part of the image
+            image = crop_brain_contour(image, plot=False)
+            # resize image
+            image = cv2.resize(image, dsize=(image_width, image_height), interpolation=cv2.INTER_CUBIC)
+            # normalize values
+            image = image / 255.
+            # convert image to numpy array and append it to X
+            X.append(image)
+            # append a value of 1 to the target array if the image
+            # is in the folder named 'yes', otherwise append 0.
+            if directory[-3:] == 'yes':
+                y.append([1])
+            else:
+                y.append([0])
+
+    X = np.array(X)
+    y = np.array(y)
+    
+    # Shuffle the data
+    X, y = shuffle(X, y)
+    
+    print(f'Number of examples is: {len(X)}')
+    print(f'X shape is: {X.shape}')
+    print(f'y shape is: {y.shape}')
+    
+    return X, y
+    
+    
+    
+    
