@@ -1,7 +1,7 @@
 # ANNpresentation
 Cancer detection system
 
-def crop_brain_contour(image, plot=False):
+    def crop_brain_contour(image, plot=False):
     #import imutils
     #import cv2
     #from matplotlib import pyplot as plt
